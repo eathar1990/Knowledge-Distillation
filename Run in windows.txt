@@ -1,0 +1,29 @@
+
+cd D:\KD_Project\kd_research_code
+
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+python -m pytest -q
+
+python diagnostics.py --dataset all
+
+python scripts/run_all.py --smoke-test --dataset phishing
+python scripts/run_all.py --smoke-test --dataset har
+
+python tune_hyperparameters.py --dataset phishing
+python tune_hyperparameters.py --dataset har
+
+python compare_shap.py --dataset phishing --samples 20 --background 15
+
+foreach ($i in 0..5) {
+    python compare_shap.py --dataset har --samples 20 --background 15 --class-index $i
+}
+
+python plot_results.py
+
+python -m pip freeze > environment_versions.txt
+python -m pytest -q
